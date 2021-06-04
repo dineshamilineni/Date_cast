@@ -1,0 +1,36 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package com.manulife.hdp.hive.udf;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.TimeZone;
+
+public class Tester {
+    public Tester() {
+    }
+
+    public static void main(String[] args) {
+        System.out.println(ZoneId.getAvailableZoneIds());
+        String ts = "305033332000";
+        String _ts = "336655732000";
+        TimeZone tz = TimeZone.getTimeZone("Asia/Hong_Kong");
+        TimeZone.setDefault(tz);
+        ZoneOffset sysOffset = OffsetDateTime.now().getOffset();
+        ZoneId zoneId_HK = ZoneId.of("Asia/Hong_Kong");
+        ZoneOffset hkOffset = zoneId_HK.getRules().getOffset(Instant.ofEpochMilli(Long.valueOf(ts)));
+        System.out.println(hkOffset);
+        LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.valueOf(ts)), sysOffset);
+        System.out.println("Sys Offset :  " + LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.valueOf(ts)), sysOffset));
+        System.out.println("HK Offset :  " + LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.valueOf(ts)), hkOffset));
+        ZonedDateTime before = dt.atZone(zoneId_HK);
+        System.out.println(before);
+    }
+}

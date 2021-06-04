@@ -1,0 +1,52 @@
+{
+    private Text result = new Text();
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+    private DateTimeFormatter shortformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+    private DateTimeFormatter msformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    ZoneId zoneId_HK = ZoneId.of("Asia/Hong_Kong");
+    ZoneOffset hkOffset;
+
+    public Cast_To_TS() {
+    }
+
+    public Text evaluate(Text ts) {
+        if (ts != null && !ts.toString().trim().isEmpty()) {
+            this.result.set("");
+
+            try {
+                if (ts.getLength() == 10) {
+                    if (ts.find("-") > -1) {
+                        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        this.result.set(this.shortformatter.format(LocalDate.parse(ts.toString(), inputFormat).atStartOfDay()));
+                        return this.result;
+                    } else {
+                        this.hkOffset = this.zoneId_HK.getRules().getOffset(Instant.ofEpochSecond(Long.valueOf(ts.toString())));
+                        this.result.set(this.shortformatter.format(LocalDateTime.ofEpochSecond(Long.valueOf(ts.toString()), 0, this.hkOffset)));
+                        return this.result;
+                    }
+                } else if (ts.getLength() == 13) {
+                    this.hkOffset = this.zoneId_HK.getRules().getOffset(Instant.ofEpochMilli(Long.valueOf(ts.toString())));
+                    this.result.set(this.msformatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.valueOf(ts.toString())), this.hkOffset)));
+                    return this.result;
+                } else {
+                    return ts.getLength() >= 19 ? ts : null;
+                }
+            } catch (NumberFormatException | DateTimeParseException var3) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public Text evaluate(LongWritable ts) {
+        if (ts != null && !ts.toString().trim().isEmpty()) {
+            int len = ts.toString().length();
+            this.hkOffset = this.zoneId_HK.getRules().getOffset(Instant.ofEpochMilli(Long.valueOf(ts.toString())));
+            this.result.set(this.msformatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.valueOf(ts.toString())), this.hkOffset)));
+            return this.result;
+        } else {
+            return null;
+        }
+    }
+}
